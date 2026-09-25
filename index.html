@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ad Task</title>
+    <!-- Telegram Web App Script -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #d1f2cf; /* ছবির ব্যাকগ্রাউন্ডের মতো রং */
+            text-align: center;
+            padding: 20px;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 90vh;
+        }
+        .ad-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-top: 20px;
+        }
+        #timer { font-size: 24px; font-weight: bold; color: #333; margin-bottom: 10px; }
+        .continue-btn {
+            background-color: #cccccc;
+            color: white;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            width: 100%;
+            cursor: not-allowed;
+        }
+        .continue-btn.active {
+            background-color: #007bff; /* এক্টিভ হলে নীল রং */
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <div>
+        <div id="timer">00:20</div>
+        <div class="ad-container">
+            <!-- এখানে আপনার Monetag বা Adsterra এর ডাইরেক্ট লিংক বা ব্যানার এডের স্ক্রিপ্ট বসাবেন -->
+            <p style="color:gray;">Ads by Monetag/Adsterra</p>
+            <a href="YOUR_ADS_LINK_HERE" target="_blank" style="text-decoration:none; color:blue;">Click to get the reward!</a>
+        </div>
+    </div>
+
+    <button id="claimBtn" class="continue-btn" disabled>Continue</button>
+
+    <script>
+        let tg = window.Telegram.WebApp;
+        tg.expand(); // ফুলস্ক্রিন করার জন্য
+
+        let timeLeft = 20; // ২০ সেকেন্ড টাইমার
+        const timerElement = document.getElementById('timer');
+        const claimBtn = document.getElementById('claimBtn');
+
+        const countdown = setInterval(() => {
+            timeLeft--;
+            timerElement.innerText = "00:" + (timeLeft < 10 ? "0" : "") + timeLeft;
+            
+            if (timeLeft <= 0) {
+                clearInterval(countdown);
+                timerElement.innerText = "Complete!";
+                claimBtn.disabled = false;
+                claimBtn.classList.add("active");
+            }
+        }, 1000);
+
+        // Continue বাটনে চাপলে ডাটা বটের কাছে চলে যাবে
+        claimBtn.addEventListener('click', () => {
+            if (!claimBtn.disabled) {
+                tg.sendData("task_completed"); 
+                tg.close(); // এড দেখা শেষে উইন্ডো বন্ধ হয়ে যাবে
+            }
+        });
+    </script>
+</body>
+</html>
