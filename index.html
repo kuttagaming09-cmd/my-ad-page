@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ad Task</title>
-    <!-- Telegram WebApp Script -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -18,6 +18,7 @@
             justify-content: space-between;
             min-height: 95vh;
         }
+
         .card {
             background: white;
             padding: 12px;
@@ -25,7 +26,19 @@
             box-shadow: 0 4px 10px rgba(0,0,0,0.08);
             margin-bottom: 12px;
         }
-        #timer { font-size: 26px; font-weight: bold; color: #2e7d32; }
+
+        #timer {
+            font-size: 26px;
+            font-weight: bold;
+            color: #2e7d32;
+        }
+
+        #networkName {
+            font-size: 14px;
+            font-weight: bold;
+            margin-top: 6px;
+        }
+
         .btn {
             display: block;
             background-color: #0288d1;
@@ -37,7 +50,15 @@
             font-weight: bold;
             font-size: 15px;
         }
-        .btn-adsterra { background-color: #e65100; }
+
+        .btn-adsterra {
+            background-color: #e65100;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
         .continue-btn {
             background-color: #b0bec5;
             color: white;
@@ -49,64 +70,140 @@
             cursor: not-allowed;
             font-weight: bold;
         }
+
         .continue-btn.active {
             background-color: #4caf50;
             cursor: pointer;
         }
+
+        .warning {
+            color: #666;
+            font-size: 12px;
+            line-height: 1.5;
+        }
     </style>
 </head>
+
 <body>
 
     <div>
-        <!-- টাইমার সেকশন -->
         <div class="card">
             <div id="timer">00:20</div>
-            <p style="margin: 5px 0 0 0; color: #555; font-size: 13px;">নিচের যেকোনো এডে ক্লিক করে ২০ সেকেন্ড অপেক্ষা করুন:</p>
+            <div id="networkName">নেটওয়ার্ক লোড হচ্ছে...</div>
+            <p style="margin: 5px 0 0 0; color: #555; font-size: 13px;">
+                নির্দেশনা সম্পূর্ণ করে ২০ সেকেন্ড অপেক্ষা করুন।
+            </p>
         </div>
 
-        <!-- AADS Banner Ad -->
-        <div class="card">
-            <div id="frame" style="width: 100%; margin: auto; position: relative; z-index: 99998;">
-                <iframe data-aa='2456314' src='https://acceptable.a-ads.com/2456314/?size=Adaptive' style='border:0; padding:0; width:100%; height:auto; overflow:hidden; display: block; margin: auto'></iframe>
+        <!-- A-ADS -->
+        <div id="aadsBox" class="card hidden">
+            <div id="frame"
+                 style="width: 100%; margin: auto; position: relative; z-index: 99998;">
+                <iframe
+                    data-aa="2456314"
+                    src="https://acceptable.a-ads.com/2456314/?size=Adaptive"
+                    style="border:0; padding:0; width:100%; height:180px; overflow:hidden; display:block; margin:auto;"
+                    title="A-ADS">
+                </iframe>
             </div>
         </div>
 
-        <!-- Monetag & Adsterra Direct Links -->
-        <div class="card">
-            <a href="https://omg10.com/4/11881546" target="_blank" class="btn">▶️ Monetag Ad Link</a>
-            <a href="https://www.profitablecpmrate.com/31397479" target="_blank" class="btn btn-adsterra">▶️ Adsterra Smartlink</a>
+        <!-- Monetag -->
+        <div id="monetagBox" class="card hidden">
+            <a href="https://omg10.com/4/11881546"
+               target="_blank"
+               rel="noopener noreferrer"
+               class="btn">
+                ▶️ Monetag Ad Link খুলুন
+            </a>
+            <div class="warning">
+                বিজ্ঞাপনের পেজ নতুন ট্যাবে খুলতে পারে।
+            </div>
+        </div>
+
+        <!-- Adsterra -->
+        <div id="adsterraBox" class="card hidden">
+            <a href="https://www.profitablecpmrate.com/31397479"
+               target="_blank"
+               rel="noopener noreferrer"
+               class="btn btn-adsterra">
+                ▶️ Adsterra Smartlink খুলুন
+            </a>
+            <div class="warning">
+                বিজ্ঞাপনের পেজ নতুন ট্যাবে খুলতে পারে।
+            </div>
         </div>
     </div>
 
-    <!-- Continue Button -->
-    <button id="claimBtn" class="continue-btn" disabled>Continue</button>
+    <button id="claimBtn" class="continue-btn" disabled>
+        Continue
+    </button>
 
     <script>
-        let tg = window.Telegram.WebApp;
+        const tg = window.Telegram.WebApp;
         tg.expand();
 
-        let timeLeft = 20;
-        const timerElement = document.getElementById('timer');
-        const claimBtn = document.getElementById('claimBtn');
+        const params = new URLSearchParams(window.location.search);
+        const network = (params.get("network") || "").toLowerCase();
 
-        const countdown = setInterval(() => {
-            timeLeft--;
-            timerElement.innerText = "00:" + (timeLeft < 10 ? "0" : "") + timeLeft;
-            
-            if (timeLeft <= 0) {
-                clearInterval(countdown);
-                timerElement.innerText = "Task Complete!";
-                claimBtn.disabled = false;
-                claimBtn.classList.add("active");
+        const networkInfo = {
+            aads: {
+                name: "A-ADS",
+                element: "aadsBox"
+            },
+            monetag: {
+                name: "Monetag",
+                element: "monetagBox"
+            },
+            adsterra: {
+                name: "Adsterra",
+                element: "adsterraBox"
             }
-        }, 1000);
+        };
 
-        claimBtn.addEventListener('click', () => {
-            if (!claimBtn.disabled) {
-                tg.sendData("task_completed");
+        const info = networkInfo[network];
+        const timerElement = document.getElementById("timer");
+        const networkNameElement = document.getElementById("networkName");
+        const claimBtn = document.getElementById("claimBtn");
+
+        // Only show the network selected by the bot.
+        if (!info) {
+            networkNameElement.innerText = "অবৈধ টাস্ক";
+            timerElement.innerText = "--:--";
+            claimBtn.disabled = true;
+        } else {
+            networkNameElement.innerText = "নেটওয়ার্ক: " + info.name;
+            document.getElementById(info.element).classList.remove("hidden");
+
+            let timeLeft = 20;
+
+            const countdown = setInterval(() => {
+                timeLeft--;
+
+                timerElement.innerText =
+                    "00:" + (timeLeft < 10 ? "0" : "") + timeLeft;
+
+                if (timeLeft <= 0) {
+                    clearInterval(countdown);
+                    timerElement.innerText = "Task Complete!";
+                    claimBtn.disabled = false;
+                    claimBtn.classList.add("active");
+                }
+            }, 1000);
+
+            claimBtn.addEventListener("click", () => {
+                if (claimBtn.disabled) return;
+
+                // Python bot verifies this network against the expected
+                // rotation slot before awarding the reward.
+                tg.sendData(JSON.stringify({
+                    action: "task_completed",
+                    network: network
+                }));
+
                 tg.close();
-            }
-        });
+            });
+        }
     </script>
 </body>
 </html>
